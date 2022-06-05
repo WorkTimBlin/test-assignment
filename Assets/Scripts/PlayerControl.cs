@@ -22,9 +22,10 @@ public class PlayerControl : CharacterControl
 	{
 		get
 		{
-			Vector2 horMove = InputActions.Player.Move.ReadValue<Vector2>();
-			if (horMove != Vector2.zero) UpdateFacingTarget();
-			return horMove;
+			float horMoveMagnitude = 
+				InputActions.Player.Move.ReadValue<Vector2>().magnitude;
+			if (horMoveMagnitude != 0) UpdateFacingTarget();
+			return Vector2.up * horMoveMagnitude;
 		}
 	}
 
@@ -68,7 +69,10 @@ public class PlayerControl : CharacterControl
 
 	private void UpdateFacingTarget()
 	{
-		facingTarget = CameraTransform.rotation;
+		facingTarget = CameraTransform.rotation * 
+			Quaternion.Euler(0, 
+				-Vector2.SignedAngle(Vector2.up, 
+				InputActions.Player.Move.ReadValue<Vector2>()), 0);
 	}
 
 	private void OnEnable()

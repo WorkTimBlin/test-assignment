@@ -1,18 +1,26 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
-public class CharacterHitBox : MonoBehaviour
+public class CharacterHitBox : MonoBehaviour, IDamagable
 {
 	[SerializeField]
-	Character character;
+	MonoBehaviour damagable;
 
-	private void OnTriggerEnter(Collider other)
+	public IDamagable Damagable =>
+		(IDamagable)((IDamagable)damagable != null && damagable != this ?
+		damagable :
+		(damagable = 
+		transform.parent.GetComponentInParent<IDamagable>() as MonoBehaviour));
+
+	public void TakeDamage(IDamager damager)
 	{
-		Damager damager = other.GetComponent<Damager>();
-		if(damager != null && damager.Enabled)
-		{
-			character.ApplyDamage(damager.DamageValue);
-		}
+		Damagable.TakeDamage(damager);
+	}
+
+	private void OnValidate()
+	{
+		damagable = Damagable as MonoBehaviour;
 	}
 }
